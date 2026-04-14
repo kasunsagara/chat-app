@@ -1,9 +1,22 @@
+import express from "express";
+import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { connectDB } from "./src/lib/db";
 import Message from "./src/models/message";
 
-const httpServer = createServer();
+const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
+const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
@@ -11,24 +24,38 @@ const io = new Server(httpServer, {
   },
 });
 
-const GLOBAL_ROOM = "global_room";
+const ROOM = "global_room";
 
-// ✅ connect DB ONCE
+// CONNECT DB
 connectDB();
 
+// 📥 CHAT HISTORY API
+app.get("/messages", async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load messages" });
+  }
+});
+
+// 🔌 SOCKET LOGIC
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.join(GLOBAL_ROOM);
+  socket.join(ROOM);
 
-  // SEND MESSAGE
   socket.on("send_message", async (data) => {
     try {
-      const msg = await Message.create(data);
+      const msg = await Message.create({
+        user: data.user,
+        message: data.message,
+        room: ROOM,
+      });
 
-      io.to(GLOBAL_ROOM).emit("receive_message", msg);
+      io.to(ROOM).emit("receive_message", msg);
     } catch (err) {
-      console.log("Message error:", err);
+      console.log("Error saving message:", err);
     }
   });
 
@@ -37,6 +64,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// START SERVER
 httpServer.listen(3001, () => {
-  console.log("Socket server running on 3001");
+  console.log("🚀 Server running on http://localhost:3001");
 });
