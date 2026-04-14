@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { socket } from "./lib/socket";
+import { useEffect, useRef, useState } from "react";
+import { socket } from "../lib/socket";
 
 type Message = {
   user: string;
@@ -15,20 +15,33 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<Message[]>([]);
 
-  // receive messages
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  // RECEIVE MESSAGES
   useEffect(() => {
-    socket.on("receive_message", (data: Message) => {
+    const handleMessage = (data: Message) => {
       setChat((prev) => [...prev, data]);
-    });
+    };
+
+    socket.on("receive_message", handleMessage);
 
     return () => {
-      socket.off("receive_message");
+      socket.off("receive_message", handleMessage);
     };
   }, []);
 
-  // send message
+  // AUTO SCROLL
+  useEffect(() => {
+    chatRef.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [chat]);
+
+  // SEND MESSAGE
   const sendMessage = () => {
     if (!message.trim()) return;
+    if (!username.trim()) return;
 
     socket.emit("send_message", {
       user: username,
@@ -77,7 +90,10 @@ export default function Home() {
       </div>
 
       {/* Chat box */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div
+        ref={chatRef}
+        className="flex-1 overflow-y-auto p-4 space-y-2"
+      >
         {chat.map((msg, index) => (
           <div key={index} className="bg-white p-2 rounded shadow">
             <b>{msg.user}:</b> {msg.message}

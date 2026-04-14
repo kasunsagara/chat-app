@@ -1,5 +1,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { connectDB } from "./src/lib/db";
+import Message from "./src/models/message";
 
 const httpServer = createServer();
 
@@ -11,26 +13,30 @@ const io = new Server(httpServer, {
 
 const GLOBAL_ROOM = "global_room";
 
+// ✅ connect DB ONCE
+connectDB();
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // join global room automatically
   socket.join(GLOBAL_ROOM);
 
-  // receive message
-  socket.on("send_message", (data: { user: string; message: string }) => {
-    console.log("Message:", data);
+  // SEND MESSAGE
+  socket.on("send_message", async (data) => {
+    try {
+      const msg = await Message.create(data);
 
-    // broadcast to all users in room
-    io.to(GLOBAL_ROOM).emit("receive_message", data);
+      io.to(GLOBAL_ROOM).emit("receive_message", msg);
+    } catch (err) {
+      console.log("Message error:", err);
+    }
   });
 
-  // disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
 });
 
 httpServer.listen(3001, () => {
-  console.log("Socket server running on http://localhost:3001");
+  console.log("Socket server running on 3001");
 });
