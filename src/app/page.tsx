@@ -9,10 +9,13 @@ type Message = {
 };
 
 export default function Home() {
+  const [username, setUsername] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<Message[]>([]);
-  const [username] = useState("Kasun");
 
+  // receive messages
   useEffect(() => {
     socket.on("receive_message", (data: Message) => {
       setChat((prev) => [...prev, data]);
@@ -23,55 +26,70 @@ export default function Home() {
     };
   }, []);
 
+  // send message
   const sendMessage = () => {
     if (!message.trim()) return;
 
-    const msgData: Message = {
+    socket.emit("send_message", {
       user: username,
       message,
-    };
+    });
 
-    socket.emit("send_message", msgData);
     setMessage("");
   };
 
+  // LOGIN SCREEN
+  if (!isLoggedIn) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-6 rounded shadow w-80">
+          <h1 className="text-xl font-bold mb-4 text-center">
+            💬 Login Chat
+          </h1>
+
+          <input
+            className="w-full border p-2 rounded mb-3"
+            placeholder="Enter username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+
+          <button
+            className="w-full bg-blue-600 text-white p-2 rounded"
+            onClick={() => {
+              if (username.trim()) setIsLoggedIn(true);
+            }}
+          >
+            Join Chat
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // CHAT SCREEN
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-100 to-slate-200">
+    <div className="flex flex-col h-screen bg-gray-100">
 
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 text-center text-xl font-bold shadow-md">
-        💬 Chat App
+      <div className="bg-blue-600 text-white p-4 text-center font-bold">
+        💬 Chat App - {username}
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Chat box */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {chat.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              msg.user === username ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`max-w-xs px-4 py-2 rounded-2xl shadow-sm break-words ${
-                msg.user === username
-                  ? "bg-blue-600 text-white rounded-br-none"
-                  : "bg-white text-gray-800 rounded-bl-none"
-              }`}
-            >
-              <p className="text-xs opacity-70 mb-1">{msg.user}</p>
-              <p className="text-sm">{msg.message}</p>
-            </div>
+          <div key={index} className="bg-white p-2 rounded shadow">
+            <b>{msg.user}:</b> {msg.message}
           </div>
         ))}
       </div>
 
-      {/* Input area */}
-      <div className="p-3 bg-white border-t flex items-center gap-2 shadow-md">
+      {/* Input */}
+      <div className="p-3 bg-white flex gap-2">
         <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-1 px-4 py-2 border rounded-full outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex-1 border p-2 rounded"
+          placeholder="Type message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -79,7 +97,7 @@ export default function Home() {
 
         <button
           onClick={sendMessage}
-          className="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white px-5 py-2 rounded-full font-medium shadow"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
         >
           Send
         </button>

@@ -1,21 +1,28 @@
 import { io, Socket } from "socket.io-client";
 
-// message type (optional here or import from types)
+// message type
 export interface Message {
   user: string;
   message: string;
 }
 
-// create socket connection
+// create socket connection (singleton)
 export const socket: Socket = io("http://localhost:3001", {
   autoConnect: true,
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
 });
 
-// optional: connection logs
+// connection events
 socket.on("connect", () => {
-  console.log("Connected to socket server:", socket.id);
+  console.log("✅ Connected to socket server:", socket.id);
 });
 
 socket.on("disconnect", () => {
-  console.log("Disconnected from server");
+  console.log("❌ Disconnected from socket server");
+});
+
+socket.on("connect_error", (err) => {
+  console.log("⚠️ Connection error:", err.message);
 });
