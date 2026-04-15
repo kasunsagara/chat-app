@@ -53,7 +53,7 @@ export default function Sidebar({
         <div className="p-5 border-b border-neutral-700 flex justify-between items-center bg-neutral-900">
           <div>
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
-              💬 ChatApp Pro
+              ChatApp Pro
             </h1>
             <p className="text-xs text-neutral-400 mt-1">
               Logged in as <span className="font-semibold text-white">{user.name}</span>

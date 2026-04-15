@@ -55,7 +55,7 @@ export default function RegisterPage() {
         {/* Logo / Brand */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
-            💬 ChatApp Pro
+            ChatApp Pro
           </h1>
           <p className="text-neutral-400 text-sm mt-2">Create your account and start chatting.</p>
         </div>
