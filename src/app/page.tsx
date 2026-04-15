@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "@/lib/socket";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "./components/sidebar";
 
 type Message = {
   user: string;
