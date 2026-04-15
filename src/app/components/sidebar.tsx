@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { FiLogOut, FiMessageSquare, FiPlus, FiUserPlus, FiUsers, FiX } from "react-icons/fi";
+
 
 type Room = {
   _id: string;
@@ -17,6 +19,8 @@ type SidebarProps = {
   onCreateRoom: (name: string) => Promise<void>;
   onJoinRoom: (roomId: string) => Promise<void>;
   onLogout: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 export default function Sidebar({
@@ -27,6 +31,8 @@ export default function Sidebar({
   onCreateRoom,
   onJoinRoom,
   onLogout,
+  isOpen,
+  onClose,
 }: SidebarProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -48,44 +54,52 @@ export default function Sidebar({
   return (
     <>
       {/* ================= LEFT SIDEBAR ================= */}
-      <div className="w-80 bg-neutral-800 border-r border-neutral-700 flex flex-col">
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-80 bg-neutral-800 border-r border-neutral-700 flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
         {/* HEADER */}
         <div className="p-5 border-b border-neutral-700 flex justify-between items-center bg-neutral-900">
           <div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
-              ChatApp Pro
+            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center gap-2">
+              <FiMessageSquare className="text-blue-400 w-6 h-6" /> ChatApp Pro
             </h1>
             <p className="text-xs text-neutral-400 mt-1">
               Logged in as <span className="font-semibold text-white">{user.name}</span>
             </p>
           </div>
 
-          <button
-            onClick={onLogout}
-            className="text-neutral-400 hover:text-red-400 transition"
-            title="Logout"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onLogout}
+              className="text-neutral-400 hover:text-red-400 transition"
+              title="Logout"
+            >
+              <FiLogOut size={20} />
+            </button>
+            <button
+              onClick={onClose}
+              className="md:hidden text-neutral-400 hover:text-white transition"
+              title="Close Sidebar"
+            >
+              <FiX size={24} />
+            </button>
+          </div>
         </div>
 
         {/* ROOM ACTIONS */}
         <div className="p-4 flex gap-2 border-b border-neutral-700">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-sm py-2 rounded-md font-medium transition shadow-lg shadow-indigo-500/20"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-sm py-2 rounded-md font-medium transition shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-1.5"
           >
-            + Create
+            <FiPlus size={16} /> Create
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-sm py-2 rounded-md font-medium transition"
+            className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-sm py-2 rounded-md font-medium transition flex items-center justify-center gap-1.5"
           >
-            Join ID
+            <FiUserPlus size={16} /> Join ID
           </button>
         </div>
 
@@ -109,7 +123,10 @@ export default function Sidebar({
               >
                 <div className="font-semibold text-sm truncate">{room.name}</div>
                 <div className="text-xs opacity-60 truncate mt-1 flex justify-between items-center">
-                  <span>{room.members.length} members</span>
+                  <span className="flex items-center gap-1">
+                    <FiUsers size={12} />
+                    {room.members.length} members
+                  </span>
                   {activeRoom?.roomId === room.roomId && (
                     <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
                   )}
