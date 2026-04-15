@@ -16,13 +16,13 @@ export const socket: Socket = io("http://localhost:3001", {
 
 // connection events
 socket.on("connect", () => {
-  console.log("✅ Connected to socket server:", socket.id);
+  console.log("Connected to socket server:", socket.id);
 });
 
 socket.on("disconnect", () => {
-  console.log("❌ Disconnected from socket server");
+  console.log("Disconnected from socket server");
 });
 
 socket.on("connect_error", (err) => {
-  console.log("⚠️ Connection error:", err.message);
+  console.log("Connection error:", err.message);
 });
