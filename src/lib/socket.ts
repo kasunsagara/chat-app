@@ -8,6 +8,7 @@ export interface Message {
 
 // create socket connection (singleton)
 export const socket: Socket = io("https://chatapp-pro-80hd.onrender.com", {
+  transports: ["websocket"],
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
