@@ -7,7 +7,7 @@ export interface Message {
 }
 
 // create socket connection (singleton)
-export const socket: Socket = io("http://localhost:3001", {
+export const socket: Socket = io("https://chatapp-pro-80hd.onrender.com", {
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
