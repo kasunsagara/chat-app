@@ -8,7 +8,6 @@ export interface Message {
 
 // create socket connection (singleton)
 export const socket: Socket = io("http://localhost:3001", {
-  transports: ["websocket"],
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
