@@ -118,5 +118,5 @@ io.on("connection", (socket) => {
 
 // START SERVER
 httpServer.listen(3001, () => {
-  console.log("Server running on http://localhost:3001");
+  console.log(`Server running on ${process.env.NEXT_PUBLIC_API_URL}`);
 });

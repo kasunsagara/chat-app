@@ -55,7 +55,7 @@ export default function Home() {
   const loadRooms = async () => {
     if (!user) return;
     try {
-      const res = await fetch(`http://localhost:3001/rooms/${user.id}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${user.id}`);
       const data = await res.json();
       setRooms(data);
       if (data.length > 0 && !activeRoom) {
@@ -77,7 +77,7 @@ export default function Home() {
     if (activeRoom) {
       socket.emit("join_room", activeRoom.roomId);
 
-      fetch(`http://localhost:3001/messages/${activeRoom.roomId}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/${activeRoom.roomId}`)
         .then((res) => res.json())
         .then((data) => setChat(data));
     }
@@ -132,7 +132,7 @@ export default function Home() {
   const handleCreateRoom = async (name: string) => {
     if (!name.trim() || !user) return;
     try {
-      const res = await fetch("http://localhost:3001/rooms/create", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, userId: user.id }),
@@ -153,7 +153,7 @@ export default function Home() {
   const handleJoinRoom = async (roomId: string) => {
     if (!roomId.trim() || !user) return;
     try {
-      const res = await fetch("http://localhost:3001/rooms/join", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId, userId: user.id }),
